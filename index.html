@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Directory Exams - Practice Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a0a2e 100%);
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #9333ea;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #9333ea, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a78bfa;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .exam-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .exam-btn {
+            background: linear-gradient(135deg, #6b21a8, #9333ea);
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .exam-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.5);
+        }
+
+        .exam-btn.active {
+            background: linear-gradient(135deg, #9333ea, #c084fc);
+            box-shadow: 0 0 30px rgba(147, 51, 234, 0.8);
+        }
+
+        .exam-content {
+            display: none;
+            background: rgba(30, 20, 40, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(147, 51, 234, 0.3);
+        }
+
+        .exam-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exam-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #9333ea;
+        }
+
+        .exam-header h2 {
+            font-size: 2.5em;
+            color: #c084fc;
+            margin-bottom: 10px;
+        }
+
+        .exam-header .meta {
+            color: #a78bfa;
+            font-size: 1.1em;
+        }
+
+        .section {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #9333ea;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #c084fc;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question {
+            background: rgba(107, 33, 168, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(147, 51, 234, 0.3);
+        }
+
+        .question-number {
+            background: #9333ea;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            color: #d8b4fe;
+            margin-bottom: 15px;
+        }
+
+        .points {
+            color: #a78bfa;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .correction-toggle {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .correction-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .correction {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+        }
+
+        .correction.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 3000px; }
+        }
+
+        .correction-title {
+            color: #10b981;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .correction-content {
+            color: #d1fae5;
+            line-height: 1.8;
+        }
+
+        .correction-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .correction-content li {
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #9333ea;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #c084fc;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        .task {
+            background: rgba(147, 51, 234, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #9333ea;
+        }
+
+        .task-title {
+            color: #c084fc;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .requirements {
+            color: #d8b4fe;
+            margin-left: 20px;
+        }
+
+        .requirements li {
+            margin-bottom: 8px;
+        }
+
+        .scenario {
+            background: rgba(192, 132, 252, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .scenario-title {
+            color: #c084fc;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .note {
+            background: rgba(251, 191, 36, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #fbbf24;
+            margin: 15px 0;
+            color: #fde68a;
+        }
+
+        .schema-box {
+            background: #000;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #9333ea;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #c084fc;
+            overflow-x: auto;
+        }
+
+        .sub-question {
+            margin-left: 20px;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid #6b21a8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .exam-btn {
+                padding: 12px 20px;
+                font-size: 0.95em;
+            }
+            
+            .exam-content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 System Administration & Active Directory</h1>
+        <p>5 Complete Exams with Detailed Corrections</p>
+        <p style="font-size: 0.9em; margin-top: 5px;">ENSA Tangier - Module GINF35</p>
+    </div>
+
+    <div class="container">
+        <div class="exam-selector">
+            <button class="exam-btn active" onclick="showExam(1)">Exam 1</button>
+            <button class="exam-btn" onclick="showExam(2)">Exam 2</button>
+            <button class="exam-btn" onclick="showExam(3)">Exam 3</button>
+            <button class="exam-btn" onclick="showExam(4)">Exam 4</button>
+            <button class="exam-btn" onclick="showExam(5)">Exam 5</button>
+        </div>
+
+        <!-- EXAM 1 -->
+        <div class="exam-content active" id="exam1">
+            <div class="exam-header">
+                <h2>Continuous Assessment Test #1</h2>
+                <p class="meta">Subject: System Administration | Duration: 1H30 | Total: 20 points</p>
+            </div>
+
+            <!-- Theory Questions -->
+            <div class="section">
+                <h3 class="section-title">📚 Theory Questions (8 points)</h3>
+
+                <div class="question">
+                    <span class="question-number">Question 1</span>
+                    <p class="question-text">What is the difference between GPO and PSO (Fine-Grained Password Policy)? Give an example of usage for each.</p>
+                    <span class="points">(1.5 points)</span>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction:</div>
+                        <div class="correction-content">
+                            <strong>GPO (Group Policy Object):</strong>
+                            <ul>
+                                <li><strong>Scope:</strong> Applies to entire domain, sites, or OUs</li>
+                                <li><strong>Password Policy:</strong> ONLY ONE policy for the entire domain</li>
+                                <li><strong>Management:</strong> Via GPMC (Group Policy Management Console)</li>
+                                <li><strong>Usage Example:</strong> Apply a 12-character minimum password policy for all domain users</li>
+                            </ul>
+                            <br>
+                            <strong>PSO (Password Settings Object) - Fine-Grained Password Policy:</strong>
+                            <ul>
+                                <li><strong>Scope:</strong> Applies to specific users or global security groups</li>
+                                <li><strong>Password Policy:</strong> MULTIPLE different policies within the same domain</li>
+                                <li><strong>Management:</strong> Via ADAC (Active Directory Administrative Center)</li>
+                                <li><strong>Usage Example:</strong> Administrators need 15-character passwords while standard users only need 8 characters</li>
+                            </ul>
+                            <br>
+                            <div class="note">
+                                <strong>⚠️ Important Point:</strong> PSOs are available starting from Windows Server 2008 and allow you to bypass the limitation of only one password policy per domain imposed by GPOs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Question 2</span>
+                    <p class="question-text">Explain the four types of user profiles in Active Directory and indicate how to create a Mandatory Profile.</p>
+                    <span class="points">(2 points)</span>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction:</div>
+                        <div class="correction-content">
+                            <strong>The 4 types of user profiles:</strong>
+                            <br><br>
+                            <strong>1. Local Profile:</strong>
+                            <ul>
+                                <li>Created automatically at first login</li>
+                                <li>Stored on local hard drive: C:\Users\Username</li>
+                                <li>Does NOT follow the user to other computers</li>
+                                <li>Each computer has its own local profile for the user</li>
+                            </ul>
+                            <br>
+                            <strong>2. Roaming Profile:</strong>
+                            <ul>
+                                <li>Stored on a network server</li>
+                                <li>Follows the user to any domain computer</li>
+                                <li>Synchronized at login and logout</li>
+                                <li>Path configured in AD: \\Server\Profiles$\%username%</li>
+                            </ul>
+                            <br>
+                            <strong>3. Mandatory Profile:</strong>
+                            <ul>
+                                <li>Read-only version of a roaming profile</li>
+                                <li>Changes are lost at logout</li>
+                                <li>Ensures a standardized environment</li>
+                                <li>Ideal for shared accounts or public kiosks</li>
+                            </ul>
+                            <br>
+                            <strong>4. Temporary Profile:</strong>
+                            <ul>
+                                <li>Created when the normal profile cannot be loaded</li>
+                                <li>All changes are lost at logout</li>
+                                <li>Indicates a problem that needs to be resolved</li>
+                            </ul>
+                            <br>
+                            <strong>📝 How to create a Mandatory Profile:</strong>
+                            <div class="code-block">
+                                <code>Step 1: Create a roaming profile first
+- Share a folder: \\SRV-AD01\Profiles$
+- In AD Users and Computers → User Properties → Profile Tab
+- Profile path: \\SRV-AD01\Profiles$\%username%
+
+Step 2: Transform into mandatory profile
+- On the server, navigate to: \\SRV-AD01\Profiles$\Username
+- Rename the file: NTUSER.DAT → NTUSER.MAN
+- Note: the file is hidden by default!
+
+Step 3: Assign to multiple users (optional)
+- Multiple users can share the same mandatory profile
+- Useful for public workstations or standardized environments</code>
+                            </div>
+                            <div class="note">
+                                <strong>💡 Reminder:</strong> NTUSER.DAT contains all the user's personal settings (wallpaper, application settings, registry keys, etc.)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Question 3</span>
+                    <p class="question-text">What is the difference between RODC and a classic DC? In which scenario would you use a RODC?</p>
+                    <span class="points">(1.5 points)</span>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction:</div>
+                        <div class="correction-content">
+                            <strong>Classic DC (Domain Controller):</strong>
+                            <ul>
+                                <li><strong>Database:</strong> COMPLETE and WRITABLE copy of AD database</li>
+                                <li><strong>Replication:</strong> Bidirectional (can write and read)</li>
+                                <li><strong>Authentication:</strong> Directly authenticates users</li>
+                                <li><strong>Modifications:</strong> Can create, modify, delete AD objects</li>
+                            </ul>
+                            <br>
+                            <strong>RODC (Read-Only Domain Controller):</strong>
+                            <ul>
+                                <li><strong>Database:</strong> READ-ONLY copy of AD database</li>
+                                <li><strong>Replication:</strong> Unidirectional (receives updates only)</li>
+                                <li><strong>Authentication:</strong> Authenticates locally but cannot modify AD</li>
+                                <li><strong>Modifications:</strong> Modification requests are forwarded to a classic DC</li>
+                                <li><strong>Password Cache:</strong> Limited and configurable password cache</li>
+                                <li><strong>Security:</strong> Does not store all domain passwords</li>
+                            </ul>
+                            <br>
+                            <strong>🎯 RODC Usage Scenarios:</strong>
+                            <ul>
+                                <li><strong>Remote Offices:</strong> Sites with poor physical security (no secure server room)</li>
+                                <li><strong>Branch Offices:</strong> Locations without qualified IT staff</li>
+                                <li><strong>DMZ:</strong> Demilitarized zones where security is critical</li>
+                                <li><strong>Public Sites:</strong> Libraries, retail stores, agencies</li>
+                            </ul>
+                            <br>
+                            <div class="note">
+                                <strong>💡 Concrete Example:</strong> A bank with 50 branches. Headquarters has classic DCs. Each branch has an RODC. If an RODC is stolen from a branch, the entire domain's passwords are NOT compromised because the RODC doesn't store them all.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Question 4</span>
+                    <p class="question-text">Which PowerShell command allows you to:</p>
+                    <div class="sub-question">
+                        <p>• Force immediate GPO application? <span class="points">(0.5 point)</span></p>
+                        <p>• Display GPOs applied to the current user? <span class="points">(0.5 point)</span></p>
+                        <p>• Release and renew a DHCP IP address? <span class="points">(1 point)</span></p>
+                    </div>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction:</div>
+                        <div class="correction-content">
+                            <strong>1. Force immediate GPO application:</strong>
+                            <div class="code-block">
+                                <code>gpupdate /force</code>
+                            </div>
+                            <ul>
+                                <li>Forces all Group Policy settings to update</li>
+                                <li>Applies changes immediately without waiting for automatic cycle</li>
+                                <li>Useful after creating or modifying a GPO</li>
+                            </ul>
+                            <br>
+                            <strong>2. Display GPOs applied to current user:</strong>
+                            <div class="code-block">
+                                <code>gpresult /r</code>
+                            </div>
+                            <ul>
+                                <li>Displays a summary of applied GPOs</li>
+                                <li>Shows both user AND computer GPOs</li>
+                                <li>For detailed HTML report: gpresult /h report.html</li>
+                            </ul>
+                            <br>
+                            <strong>3. Release and renew a DHCP IP address:</strong>
+                            <div class="code-block">
+                                <code># Release current IP address
+ipconfig /release
+
+# Request new IP address from DHCP server
+ipconfig /renew
+
+# OR combined in one command:
+ipconfig /release && ipconfig /renew</code>
+                            </div>
+                            <ul>
+                                <li><strong>ipconfig /release:</strong> Releases current IP and informs DHCP server</li>
+                                <li><strong>ipconfig /renew:</strong> Requests new IP from DHCP server</li>
+                                <li>Useful for troubleshooting network connectivity issues</li>
+                            </ul>
+                            <br>
+                            <div class="note">
+                                <strong>💡 Bonus Commands:</strong><br>
+                                • <code>ipconfig /all</code> - Display all network configuration details<br>
+                                • <code>ipconfig /flushdns</code> - Flush local DNS cache<br>
+                                • <code>nslookup domainname</code> - Test DNS resolution
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Question 5</span>
+                    <p class="question-text">Explain the difference between "Assign" and "Publish" when deploying software via GPO.</p>
+                    <span class="points">(1 point)</span>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction:</div>
+                        <div class="correction-content">
+                            <strong>ASSIGN:</strong>
+                            <br><br>
+                            <strong>Assign to Computers:</strong>
+                            <ul>
+                                <li><strong>GPO Path:</strong> Computer Configuration → Software Settings → Software Installation</li>
+                                <li><strong>Installation:</strong> Automatic at computer startup</li>
+                                <li><strong>Availability:</strong> For ALL users of the machine</li>
+                                <li><strong>Icon:</strong> Visible in Start menu</li>
+                                <li><strong>Uninstallation:</strong> If GPO is removed, software can be automatically uninstalled</li>
+                            </ul>
+                            <br>
+                            <strong>Assign to Users:</strong>
+                            <ul>
+                                <li><strong>GPO Path:</strong> User Configuration → Software Settings → Software Installation</li>
+                                <li><strong>Installation:</strong> At first user login OR first launch</li>
+                                <li><strong>Availability:</strong> Only for the specific user</li>
+                                <li><strong>Follows user:</strong> Available on any domain computer</li>
+                            </ul>
+                            <br>
+                            <strong>PUBLISH:</strong>
+                            <ul>
+                                <li><strong>Available only for:</strong> User Configuration (NOT for Computer Configuration)</li>
+                                <li><strong>GPO Path:</strong> User Configuration → Software Settings → Software Installation</li>
+                                <li><strong>Installation:</strong> MANUAL by the user</li>
+                                <li><strong>Where to find:</strong> In "Add/Remove Programs" (Control Panel)</li>
+                                <li><strong>Flexibility:</strong> User chooses whether to install or not</li>
+                                <li><strong>No icon:</strong> Doesn't appear automatically in Start menu</li>
+                            </ul>
+                            <br>
+                            <strong>📊 Comparison Table:</strong>
+                            <div class="schema-box">┌──────────────────┬──────────────────┬──────────────────┐
+│                  │  ASSIGN          │  PUBLISH         │
+├──────────────────┼──────────────────┼──────────────────┤
+│ Target           │ Users/Computers  │ Users only       │
+│ Installation     │ Automatic        │ Manual           │
+│ Visibility       │ Start Menu       │ Add/Remove       │
+│ User Choice      │ No               │ Yes              │
+└──────────────────┴──────────────────┴──────────────────┘</div>
+                            <div class="note">
+                                <strong>💡 Usage Examples:</strong><br>
+                                • <strong>Assign:</strong> Mandatory antivirus for all computers<br>
+                                • <strong>Publish:</strong> Optional software (Photoshop, specialized tools)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Section -->
+            <div class="section">
+                <h3 class="section-title">💻 Problem: Active Directory Infrastructure (12 points)</h3>
+
+                <div class="scenario">
+                    <div class="scenario-title">📋 Context:</div>
+                    <p>A company "TechCorp" wants to modernize its IT infrastructure. It has:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>50 employees distributed across 3 departments: IT, HR, Commercial</li>
+                        <li>1 Windows Server 2016 server (SRV-AD01)</li>
+                        <li>4 Windows 10 Pro client computers</li>
+                        <li>Need for enhanced security for the IT department</li>
+                    </ul>
+                    <p style="margin-top: 10px;">The IT director assigns you the following tasks:</p>
+                </div>
+
+                <div class="task">
+                    <div class="task-title">Task 1: Basic Infrastructure Configuration (4 points)</div>
+                    
+                    <p style="color: #d8b4fe; margin-bottom: 15px;"><strong>1.1</strong> Propose a virtual mockup (network diagram) showing:</p>
+                    <ul class="requirements">
+                        <li>The DC server with its roles (AD DS, DNS, DHCP)</li>
+                        <li>The 4 clients distributed by department</li>
+                        <li>Network topology with a central switch</li>
+                        <li>IP address ranges (use network 192.168.10.0/24)</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Network Diagram:</div>
+                        <div class="correction-content">
+                            <div class="schema-box">                INTERNET
+                    |
+            ┌───────┴───────┐
+            │   Router      │
+            │ 192.168.10.1  │
+            └───────┬───────┘
+                    |
+            ┌───────┴────────┐
+            │  SWITCH        │
+            │  (Central)     │
+            └───┬────┬───┬───┘
+                │    │   │
+        ┌───────┴┐ ┌─┴───┴───────┬───────────┐
+        │        │ │             │           │
+    ┌───┴───┐ ┌─┴──┴──┐ ┌──────┴─────┐ ┌──┴────────┐
+    │SRV-AD01│ │Client1│ │  Client2   │ │ Client3   │
+    │  DC    │ │  IT   │ │    HR      │ │ Commercial│
+    │  DNS   │ └───────┘ └────────────┘ └───────────┘
+    │  DHCP  │              ┌────────────┐
+    │.10.10  │              │  Client4   │
+    └────────┘              │ Commercial │
+                            │            │
+                            └────────────┘
+
+<strong>IP Address Plan:</strong>
+┌────────────────────┬─────────────────┬────────────┐
+│ Device             │ IP Address      │ Type       │
+├────────────────────┼─────────────────┼────────────┤
+│ Router/Gateway     │ 192.168.10.1    │ Static     │
+│ SRV-AD01 (DC)      │ 192.168.10.10   │ Static     │
+│ DHCP Pool Start    │ 192.168.10.100  │ Dynamic    │
+│ DHCP Pool End      │ 192.168.10.200  │ Dynamic    │
+│ Client1 (IT)       │ 192.168.10.101  │ DHCP       │
+│ Client2 (HR)       │ 192.168.10.102  │ DHCP       │
+│ Client3 (Comm)     │ 192.168.10.103  │ DHCP       │
+│ Client4 (Comm)     │ 192.168.10.104  │ DHCP       │
+└────────────────────┴─────────────────┴────────────┘
+
+<strong>Roles on SRV-AD01:</strong>
+✓ AD DS (Active Directory Domain Services)
+✓ DNS Server
+✓ DHCP Server
+✓ File Server (for profiles and software deployment)</div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>1.2</strong> List the detailed steps to:</p>
+                    <ul class="requirements">
+                        <li>Promote SRV-AD01 to domain controller (domain: techcorp.loc)</li>
+                        <li>Join a Windows 10 client to the domain</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Detailed Steps:</div>
+                        <div class="correction-content">
+                            <strong>A) Promote SRV-AD01 to Domain Controller:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Install AD DS Role</strong>
+- Open Server Manager
+- Click "Add Roles and Features"
+- Select "Role-based or feature-based installation"
+- Select the server (SRV-AD01)
+- Check "Active Directory Domain Services"
+- Add required features when prompted
+- Click Next through remaining screens
+- Click Install
+
+<strong>Step 2: Promote to Domain Controller</strong>
+- After installation, click the notification flag
+- Click "Promote this server to a domain controller"
+- Select "Add a new forest"
+- Root domain name: techcorp.loc
+- Click Next
+
+<strong>Step 3: Domain Controller Options</strong>
+- Forest functional level: Windows Server 2016
+- Domain functional level: Windows Server 2016
+- Check: Domain Name System (DNS) server
+- Check: Global Catalog (GC)
+- Type DSRM password (Directory Services Restore Mode)
+- Click Next
+
+<strong>Step 4: DNS Options</strong>
+- Skip the DNS delegation warning (click Next)
+
+<strong>Step 5: Additional Options</strong>
+- NetBIOS domain name: TECHCORP (auto-generated)
+- Click Next
+
+<strong>Step 6: Paths</strong>
+- Database folder: C:\Windows\NTDS
+- Log files folder: C:\Windows\NTDS
+- SYSVOL folder: C:\Windows\SYSVOL
+- Click Next
+
+<strong>Step 7: Review and Install</strong>
+- Review configuration
+- Click Install
+- Server will restart automatically</code>
+                            </div>
+                            <br>
+                            <strong>B) Join Windows 10 Client to Domain:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Configure DNS on Client</strong>
+- Open Network and Sharing Center
+- Click on Ethernet/WiFi connection
+- Click Properties
+- Select "Internet Protocol Version 4 (TCP/IPv4)"
+- Click Properties
+- Set DNS server to: 192.168.10.10 (DC IP address)
+- Click OK
+
+<strong>Step 2: Join the Domain</strong>
+- Right-click "This PC" → Properties
+- Click "Change settings" next to computer name
+- Click "Change" button
+- Select "Domain" radio button
+- Enter: techcorp.loc
+- Click OK
+
+<strong>Step 3: Provide Credentials</strong>
+- Username: Administrator
+- Password: [Domain admin password]
+- Click OK
+
+<strong>Step 4: Welcome Message</strong>
+- "Welcome to the techcorp.loc domain" message appears
+- Click OK
+
+<strong>Step 5: Restart</strong>
+- Restart the computer
+- Login using domain credentials: TECHCORP\username</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task">
+                    <div class="task-title">Task 2: Active Directory Organization (3 points)</div>
+                    
+                    <p style="color: #d8b4fe; margin-bottom: 15px;"><strong>2.1</strong> Create the following OU structure:</p>
+                    <div class="schema-box">TechCorp.loc
+├── Departments
+│   ├── IT
+│   ├── HR
+│   └── Commercial
+├── Computers
+└── Servers</div>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Creating OU Structure:</div>
+                        <div class="correction-content">
+                            <strong>Method 1: Using GUI (Active Directory Users and Computers):</strong>
+                            <div class="code-block">
+                                <code><strong>Step-by-step:</strong>
+1. Open "Active Directory Users and Computers"
+2. Right-click on "techcorp.loc" → New → Organizational Unit
+3. Name: "Departments" → Check "Protect container from deletion" → OK
+4. Right-click "Departments" → New → Organizational Unit
+   - Create: IT
+   - Create: HR
+   - Create: Commercial
+5. Right-click on "techcorp.loc" → New → Organizational Unit
+   - Create: "Computers"
+6. Right-click on "techcorp.loc" → New → Organizational Unit
+   - Create: "Servers"</code>
+                            </div>
+                            <br>
+                            <strong>Method 2: Using PowerShell:</strong>
+                            <div class="code-block">
+                                <code># Create main OUs
+New-ADOrganizationalUnit -Name "Departments" -Path "DC=techcorp,DC=loc"
+New-ADOrganizationalUnit -Name "Computers" -Path "DC=techcorp,DC=loc"
+New-ADOrganizationalUnit -Name "Servers" -Path "DC=techcorp,DC=loc"
+
+# Create sub-OUs under Departments
+New-ADOrganizationalUnit -Name "IT" -Path "OU=Departments,DC=techcorp,DC=loc"
+New-ADOrganizationalUnit -Name "HR" -Path "OU=Departments,DC=techcorp,DC=loc"
+New-ADOrganizationalUnit -Name "Commercial" -Path "OU=Departments,DC=techcorp,DC=loc"</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>2.2</strong> For the IT department, create:</p>
+                    <ul class="requirements">
+                        <li>A global security group "GRP_IT_Admins"</li>
+                        <li>Two users: "admin_it1" and "admin_it2"</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Creating Group and Users:</div>
+                        <div class="correction-content">
+                            <strong>Method 1: Using GUI:</strong>
+                            <div class="code-block">
+                                <code><strong>Create Security Group:</strong>
+1. In AD Users and Computers, navigate to OU=IT
+2. Right-click → New → Group
+3. Group name: GRP_IT_Admins
+4. Group scope: Global
+5. Group type: Security
+6. Click OK
+
+<strong>Create Users:</strong>
+1. Right-click OU=IT → New → User
+2. First name: Admin IT
+   Last name: One
+   User logon name: admin_it1
+3. Click Next
+4. Set password (must meet complexity requirements)
+5. Uncheck "User must change password at next logon"
+6. Check "Password never expires" (for admin accounts)
+7. Click Next → Finish
+8. Repeat for admin_it2
+
+<strong>Add Users to Group:</strong>
+1. Right-click GRP_IT_Admins → Properties
+2. Go to Members tab → Add
+3. Type: admin_it1; admin_it2
+4. Click Check Names → OK</code>
+                            </div>
+                            <br>
+                            <strong>Method 2: Using PowerShell:</strong>
+                            <div class="code-block">
+                                <code># Create Security Group
+New-ADGroup -Name "GRP_IT_Admins" -GroupScope Global -GroupCategory Security -Path "OU=IT,OU=Departments,DC=techcorp,DC=loc"
+
+# Create Users
+New-ADUser -Name "Admin IT One" -GivenName "Admin IT" -Surname "One" -SamAccountName "admin_it1" -UserPrincipalName "admin_it1@techcorp.loc" -Path "OU=IT,OU=Departments,DC=techcorp,DC=loc" -AccountPassword (ConvertTo-SecureString "P@ssw0rd123!" -AsPlainText -Force) -Enabled $true
+
+New-ADUser -Name "Admin IT Two" -GivenName "Admin IT" -Surname "Two" -SamAccountName "admin_it2" -UserPrincipalName "admin_it2@techcorp.loc" -Path "OU=IT,OU=Departments,DC=techcorp,DC=loc" -AccountPassword (ConvertTo-SecureString "P@ssw0rd123!" -AsPlainText -Force) -Enabled $true
+
+# Add users to group
+Add-ADGroupMember -Identity "GRP_IT_Admins" -Members "admin_it1","admin_it2"</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>2.3</strong> Explain why use OUs rather than putting all objects directly in the domain.</p>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Benefits of OUs:</div>
+                        <div class="correction-content">
+                            <strong>Reasons to use Organizational Units (OUs):</strong>
+                            <br><br>
+                            <strong>1. Delegation of Administration:</strong>
+                            <ul>
+                                <li>Assign specific administrators to manage only their OU (e.g., HR manager manages HR OU)</li>
+                                <li>No need to give full domain admin rights</li>
+                                <li>Improves security through least privilege principle</li>
+                            </ul>
+                            <br>
+                            <strong>2. Group Policy Application:</strong>
+                            <ul>
+                                <li>GPOs can be linked to specific OUs</li>
+                                <li>Different policies for different departments (IT has strict security, HR has different requirements)</li>
+                                <li>More granular control than domain-wide policies</li>
+                            </ul>
+                            <br>
+                            <strong>3. Organization and Structure:</strong>
+                            <ul>
+                                <li>Mirror your company's organizational structure</li>
+                                <li>Easy to find and manage objects</li>
+                                <li>Clear hierarchy and logical grouping</li>
+                            </ul>
+                            <br>
+                            <strong>4. Simplified Management:</strong>
+                            <ul>
+                                <li>Bulk operations on all objects in an OU</li>
+                                <li>Move objects between OUs as organizational structure changes</li>
+                                <li>Filter and search objects more easily</li>
+                            </ul>
+                            <br>
+                            <strong>5. Security and Permissions:</strong>
+                            <ul>
+                                <li>Apply permissions at OU level</li>
+                                <li>Inherit permissions down the OU hierarchy</li>
+                                <li>Control who can create, modify, or delete objects</li>
+                            </ul>
+                            <br>
+                            <div class="note">
+                                <strong>💡 Example:</strong> Without OUs, a 50-employee company would have all users, computers, and groups in one flat list. With OUs, you can organize by department, making it easy to apply department-specific policies and delegate management.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task">
+                    <div class="task-title">Task 3: Group Policy Management (3 points)</div>
+                    
+                    <p style="color: #d8b4fe; margin-bottom: 15px;">The IT department requires strict security rules:</p>
+                    
+                    <p style="color: #d8b4fe; margin-bottom: 15px;"><strong>3.1</strong> Create a GPO named "GPO_IT_Security" that:</p>
+                    <ul class="requirements">
+                        <li>Forces a minimum password length of 12 characters</li>
+                        <li>Enforces a password history of 10 passwords</li>
+                        <li>Sets a maximum password age of 60 days</li>
+                        <li>Enables password complexity requirements</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Create Password Policy GPO:</div>
+                        <div class="correction-content">
+                            <strong>Step-by-step Configuration:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Open GPMC</strong>
+- Press Windows + R
+- Type: gpmc.msc
+- Press Enter
+
+<strong>Step 2: Create New GPO</strong>
+- Expand Forest → Domains → techcorp.loc
+- Right-click on "Departments\IT" OU
+- Select "Create a GPO in this domain, and Link it here"
+- Name: GPO_IT_Security
+- Click OK
+
+<strong>Step 3: Edit the GPO</strong>
+- Right-click "GPO_IT_Security"
+- Select "Edit"
+
+<strong>Step 4: Navigate to Password Policy</strong>
+- Go to: Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies → Password Policy
+
+<strong>Step 5: Configure Password Settings</strong>
+1. Double-click "Minimum password length"
+   - Set to: 12 characters
+   - Click OK
+
+2. Double-click "Enforce password history"
+   - Set to: 10 passwords remembered
+   - Click OK
+
+3. Double-click "Maximum password age"
+   - Set to: 60 days
+   - Click OK
+
+4. Double-click "Password must meet complexity requirements"
+   - Set to: Enabled
+   - Click OK
+
+<strong>Step 6: Apply the Policy</strong>
+- Close Group Policy Editor
+- On client machines: Run "gpupdate /force"
+- Or wait for automatic update (90 minutes)</code>
+                            </div>
+                            <div class="note">
+                                <strong>⚠️ Important:</strong> Password policies only work when applied at the DOMAIN level or via PSO (Fine-Grained Password Policy) for specific groups. If you need different password policies for different OUs, use PSO instead!
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>3.2</strong> Disable Control Panel access for all users in the Commercial department only.</p>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Disable Control Panel:</div>
+                        <div class="correction-content">
+                            <div class="code-block">
+                                <code><strong>Step 1: Create and Link GPO</strong>
+- Open GPMC (gpmc.msc)
+- Right-click "Commercial" OU
+- Create a GPO in this domain, and Link it here
+- Name: GPO_Commercial_Restrictions
+- Click OK
+
+<strong>Step 2: Edit GPO</strong>
+- Right-click the new GPO → Edit
+- Navigate to: User Configuration → Policies → Administrative Templates → Control Panel
+
+<strong>Step 3: Configure Setting</strong>
+- Double-click "Prohibit access to Control Panel and PC settings"
+- Select: Enabled
+- Click OK
+
+<strong>Step 4: Apply Policy</strong>
+- Close Group Policy Editor
+- On Commercial department computers: gpupdate /force
+
+<strong>Step 5: Verify</strong>
+- Log in as a Commercial department user
+- Try to open Control Panel
+- Should see: "This operation has been cancelled due to restrictions"</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>3.3</strong> Automatically deploy "Notepad++" software (file: \\SRV-AD01\Software\notepadpp.msi) to all IT department computers at machine startup.</p>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Deploy Software via GPO:</div>
+                        <div class="correction-content">
+                            <strong>Complete Procedure:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Prepare Network Share</strong>
+- On SRV-AD01, create folder: C:\Software
+- Copy notepadpp.msi to this folder
+- Right-click C:\Software → Properties → Sharing tab
+- Click "Advanced Sharing"
+- Check "Share this folder"
+- Share name: Software
+- Click Permissions
+- Give "Domain Computers" Read permission
+- Click OK
+
+<strong>Step 2: Create/Edit GPO</strong>
+- Open GPMC (gpmc.msc)
+- Right-click "IT" OU
+- Create a GPO: "GPO_IT_Software_Deployment"
+- Right-click → Edit
+
+<strong>Step 3: Configure Software Installation</strong>
+- Navigate to: Computer Configuration → Policies → Software Settings → Software Installation
+- Right-click "Software Installation" → New → Package
+- Browse to: \\SRV-AD01\Software\notepadpp.msi
+  (MUST use UNC path, NOT C:\ local path!)
+- In "Deploy Software" dialog, select: Assigned
+- Click OK
+
+<strong>Step 4: Verify Configuration</strong>
+- The software should appear in the list
+- Deployment method: Assigned
+- Extension: .msi
+
+<strong>Step 5: Apply to Computers</strong>
+- Move IT department computers to "IT" OU if not already there
+- Restart the computers
+- Software will install automatically at startup
+- All users on that computer will have access
+
+<strong>Step 6: Verify Installation</strong>
+- After restart, check: C:\Program Files\Notepad++
+- Software should be in Start Menu</code>
+                            </div>
+                            <div class="note">
+                                <strong>💡 Key Points:</strong><br>
+                                • Use COMPUTER Configuration (not User) to install at startup<br>
+                                • Must use UNC path (\\server\share\file.msi)<br>
+                                • Choose "Assigned" for automatic installation<br>
+                                • Software is available to ALL users on the computer
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task">
+                    <div class="task-title">Task 4: User Profile Management (2 points)</div>
+                    
+                    <p style="color: #d8b4fe; margin-bottom: 15px;"><strong>4.1</strong> Create a roaming profile for user "admin_it1":</p>
+                    <ul class="requirements">
+                        <li>Share path: \\SRV-AD01\Profiles$</li>
+                        <li>List the necessary NTFS permissions on this folder</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Create Roaming Profile:</div>
+                        <div class="correction-content">
+                            <strong>Complete Configuration:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Create Shared Folder on Server</strong>
+- On SRV-AD01, create folder: C:\Profiles
+- Right-click → Properties → Sharing tab
+- Click "Advanced Sharing"
+- Check "Share this folder"
+- Share name: Profiles$ ($ makes it hidden)
+- Click Permissions
+- Remove "Everyone"
+- Add "Domain Users" with Read permission
+- Click OK
+
+<strong>Step 2: Set NTFS Permissions</strong>
+- Still in Properties → Security tab
+- Click "Edit" → "Add"
+- Configure permissions:
+
+  1. SYSTEM: Full Control
+  2. Administrators: Full Control
+  3. Creator Owner: Full Control
+  4. Users (Domain Users):
+     - Create Folder / Append Data
+     - List Folder / Read Data
+     - Read Attributes
+     - Read Extended Attributes
+     - Traverse Folder / Execute File
+
+<strong>Detailed NTFS Permissions Setup:</strong>
+- Click "Advanced" button
+- Click "Add"
+- Principal: Users
+- Type: Allow
+- Applies to: This folder only
+- Permissions:
+  ✓ Traverse folder / execute file
+  ✓ List folder / read data
+  ✓ Read attributes
+  ✓ Read extended attributes
+  ✓ Create folders / append data
+- Click OK
+
+<strong>Step 3: Configure User Profile Path</strong>
+- Open "Active Directory Users and Computers"
+- Navigate to OU=IT
+- Right-click "admin_it1" → Properties
+- Go to "Profile" tab
+- Profile path: \\SRV-AD01\Profiles$\%username%
+  (Use %username% variable for automatic folder creation)
+- Click OK
+
+<strong>Step 4: Test the Profile</strong>
+- Log in as admin_it1 on a client computer
+- The profile folder will be created automatically
+- Make some changes (wallpaper, desktop icons)
+- Log out
+- Log in from another computer
+- Changes should follow the user</code>
+                            </div>
+                            <br>
+                            <strong>📋 Summary of Required NTFS Permissions:</strong>
+                            <div class="schema-box">┌─────────────────┬──────────────────────────────────┐
+│ Account         │ Permission                       │
+├─────────────────┼──────────────────────────────────┤
+│ SYSTEM          │ Full Control                     │
+│ Administrators  │ Full Control                     │
+│ Creator Owner   │ Full Control (subfolders only)   │
+│ Domain Users    │ Create Folder / Append Data      │
+│                 │ List Folder / Read Data          │
+│                 │ Read Attributes                  │
+│                 │ Read Extended Attributes         │
+│                 │ Traverse Folder / Execute File   │
+└─────────────────┴──────────────────────────────────┘</div>
+                        </div>
+                    </div>
+
+                    <p style="color: #d8b4fe; margin: 20px 0 15px 0;"><strong>4.2</strong> Transform this profile into a mandatory profile by explaining:</p>
+                    <ul class="requirements">
+                        <li>The file to modify</li>
+                        <li>The benefit of a mandatory profile for a public "kiosk" account</li>
+                    </ul>
+
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Correction - Mandatory Profile:</div>
+                        <div class="correction-content">
+                            <strong>How to Create Mandatory Profile:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Let User Log In First</strong>
+- User admin_it1 must log in at least once
+- This creates the roaming profile folder
+- Configure desktop, wallpaper, settings as desired
+- Log out
+
+<strong>Step 2: Locate the Profile on Server</strong>
+- On SRV-AD01, navigate to: C:\Profiles\admin_it1
+- Enable viewing hidden files:
+  • File Explorer → View tab
+  • Check "Hidden items"
+
+<strong>Step 3: Rename NTUSER.DAT</strong>
+- Find file: NTUSER.DAT (hidden file)
+- Rename to: NTUSER.MAN
+  (.MAN = Mandatory)
+
+<strong>Step 4: Configure Profile Path (Optional)</strong>
+- If you want multiple users to share this profile:
+  • In AD Users and Computers
+  • Set Profile path for multiple users to:
+    \\SRV-AD01\Profiles$\admin_it1
+  • All these users will get the same mandatory profile
+
+<strong>Step 5: Test</strong>
+- Log in as admin_it1
+- Make changes (move icons, change wallpaper)
+- Log out
+- Log in again
+- All changes are gone - profile resets!</code>
+                            </div>
+                            <br>
+                            <strong>🎯 Benefits of Mandatory Profile for Public Kiosk:</strong>
+                            <br><br>
+                            <strong>1. Consistency:</strong>
+                            <ul>
+                                <li>Every user gets the exact same desktop environment</li>
+                                <li>No confusion for users - interface is always the same</li>
+                                <li>Professional, standardized appearance</li>
+                            </ul>
+                            <br>
+                            <strong>2. Security:</strong>
+                            <ul>
+                                <li>Users cannot install unauthorized software</li>
+                                <li>Cannot save files to desktop (changes don't persist)</li>
+                                <li>Previous user's data is not accessible</li>
+                                <li>Malware cannot persist across sessions</li>
+                            </ul>
+                            <br>
+                            <strong>3. Maintenance:</strong>
+                            <ul>
+                                <li>No need to clean up after users</li>
+                                <li>Profile automatically resets</li>
+                                <li>Reduces IT support calls</li>
+                                <li>Easy to update - change one master profile</li>
+                            </ul>
+                            <br>
+                            <strong>4. Storage:</strong>
+                            <ul>
+                                <li>No profile bloat over time</li>
+                                <li>Saves server storage space</li>
+                                <li>Faster login times</li>
+                            </ul>
+                            <br>
+                            <div class="note">
+                                <strong>💡 Perfect Use Cases:</strong><br>
+                                • Public library computers<br>
+                                • Airport/hotel business centers<br>
+                                • Shared kiosk stations<br>
+                                • Point-of-sale terminals<br>
+                                • Student computer labs
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bonus Section -->
+            <div class="section">
+                <h3 class="section-title">🌟 Bonus Question (2 points)</h3>
+
+                <div class="question">
+                    <span class="question-number">Advanced Technical Question</span>
+                    <p class="question-text">An administrator notices that some HR department users need a different password policy (8 characters minimum instead of 12, because they use tablets).</p>
+                    <p class="question-text">How can you apply this policy without modifying the main domain GPO? Detail the complete procedure using ADAC (Active Directory Administrative Center) and the steps to configure a PSO.</p>
+                    <span class="points">(2 points)</span>
+                    <button class="correction-toggle" onclick="toggleCorrection(this)">Show Correction ✓</button>
+                    <div class="correction">
+                        <div class="correction-title">✅ Complete Correction - Fine-Grained Password Policy (PSO):</div>
+                        <div class="correction-content">
+                            <strong>Complete Step-by-Step Procedure:</strong>
+                            <div class="code-block">
+                                <code><strong>Step 1: Open ADAC</strong>
+- On Domain Controller (SRV-AD01)
+- Press Windows + R
+- Type: dsac.exe
+- Press Enter
+
+<strong>Step 2: Navigate to Password Settings Container</strong>
+- In ADAC, click on domain: techcorp (local)
+- Double-click "System"
+- Double-click "Password Settings Container"
+
+<strong>Step 3: Create New Password Settings</strong>
+- In right panel, click "New"
+- Click "Password Settings"
+
+<strong>Step 4: Configure PSO Settings</strong>
+Name: PSO_HR_Tablet_Users
+Precedence: 10 (lower number = higher priority)
+
+<strong>Password Settings:</strong>
+- Enforce minimum password length: Yes
+- Minimum password length: 8
+
+- Enforce password history: Yes
+- Number of passwords remembered: 5
+
+- Password must meet complexity requirements: Yes
+
+- Store password using reversible encryption: No
+
+- Enforce minimum password age: Yes
+- Minimum password age (days): 1
+
+- Enforce maximum password age: Yes
+- Maximum password age (days): 90
+
+- Enforce account lockout policy: Yes
+- Number of failed logon attempts: 5
+- Reset failed logon attempts count after (mins): 30
+- Account will be locked out: For duration (mins): 30
+
+<strong>Step 5: Assign to HR Users</strong>
+- Scroll down to "Directly Applies To" section
+- Click "Add"
+- Click "Object Types" → Check "Groups"
+- Search for: GRP_HR_Users (or individual user names)
+- Click OK
+
+<strong>Alternative: Create HR Group First</strong>
+- Open AD Users and Computers
+- Navigate to HR OU
+- Create new group: GRP_HR_Tablet_Users
+- Add HR users to this group
+- Then apply PSO to this group
+
+<strong>Step 6: Verify PSO Application</strong>
+- Click OK to create the PSO
+- Users in the group will now have this policy
+
+<strong>Step 7: Check Which PSO Applies to a User</strong>
+- In ADAC, navigate to HR OU
+- Right-click a user → Properties
+- Look for "Resultant Password Settings"
+- Should show: PSO_HR_Tablet_Users</code>
+                            </div>
+                            <br>
+                            <strong>📊 Understanding PSO Precedence:</strong>
+                            <div class="schema-box">Precedence Value (lower = higher priority)
+┌────────────────────────────────────────────────┐
+│ PSO Precedence: 1  ← Highest priority         │
+│ PSO Precedence: 10 ← Medium priority          │
+│ PSO Precedence: 100 ← Lowest priority         │
+│ Domain Default GPO ← Applied if no PSO exists │
+└────────────────────────────────────────────────┘
+
+If a user is in multiple groups with different PSOs:
+- The PSO with the LOWEST precedence number wins
+- If precedence is equal, PSO applied directly to user wins</div>
+                            <br>
+                            <strong>✅ Verification Commands:</strong>
+                            <div class="code-block">
+                                <code># Check PSO settings
+Get-ADFineGrainedPasswordPolicy -Filter *
+
+# Check which PSO applies to a user
+Get-ADUserResultantPasswordPolicy -Identity admin_hr1
+
+# See all users/groups with PSO applied
+Get-ADFineGrainedPasswordPolicy -Identity "PSO_HR_Tablet_Users" | Select-Object -ExpandProperty AppliesTo</code>
+                            </div>
+                            <br>
+                            <div class="note">
+                                <strong>💡 Key Points:</strong><br>
+                                • PSOs can ONLY be applied to Global Security Groups or individual users<br>
+                                • Cannot be applied to OUs directly<br>
+                                • Requires Windows Server 2008 or later<br>
+                                • Domain functional level must be Windows Server 2008 or higher<br>
+                                • PSO overrides the domain default password policy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXAM 2 -->
+        <div class="exam-content" id="exam2">
+            <div class="exam-header">
+                <h2>Continuous Assessment Test #2</h2
